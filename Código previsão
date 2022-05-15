@@ -1,0 +1,38 @@
+### Importando e separando dados do INMET
+#Obtendo dados
+import requests
+
+#Alterar data inicial / Data final na url 
+url = "https://apitempo.inmet.gov.br/estacao/2022-04-25/2022-04-25/A201"
+resultado = requests.get(url)
+dados = resultado.json()
+
+#Convertendo em um DataFrame e filtrando
+import pandas as pd
+import json
+
+dados_str = json.dumps(dados)
+dados_tabela = pd.read_json(dados_str)
+
+dados_filtrados = dados_tabela[["DT_MEDICAO","HR_MEDICAO","RAD_GLO","TEM_INS","UMD_INS"]]
+
+print(dados_filtrados)
+
+
+### Lidando com NAs (falta alterar)
+
+
+### Umidade (falta alterar)(ajustar os dados e fazer a análise gráfica e testes com arima)
+umidade = dados_filtrados[["DT_MEDICAO","HR_MEDICAO","UMD_INS"]]
+print(umidade)
+
+
+### Temperatura (falta alterar)(ajustar os dados e fazer a análise gráfica e testes com arima)
+temperatura = dados_filtrados[["DT_MEDICAO","HR_MEDICAO","TEM_INS"]]
+print(temperatura)
+
+
+### Radiação (falta alterar)(ajustar os dados e fazer a análise gráfica e testes com arima)
+radiação = dados_filtrados[["DT_MEDICAO","HR_MEDICAO","RAD_GLO"]]
+print(radiação)
+###corrigir os 0<
