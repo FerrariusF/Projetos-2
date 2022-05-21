@@ -1,5 +1,6 @@
+## Importando e separando os dados do INMET
 ### Importando e separando dados do INMET
-#Obtendo dados
+# Obtendo dados
 import requests
 
 #Alterar data inicial / Data final na url 
@@ -19,10 +20,12 @@ dados_filtrados = dados_tabela[["DT_MEDICAO","HR_MEDICAO","RAD_GLO","TEM_INS","U
 print(dados_filtrados)
 
 
-### Lidando com NAs (falta alterar)
+
+### Lidando com NAs e ajustando dados
+#### Umidade
 import matplotlib.pyplot as plt
 
-##Coluna umidade com NAs
+#Coluna umidade com NAs
 coluna_umidade_cNAs = dados_filtrados[["UMD_INS"]]
 #Numero de NAs
 print("Numero de NAs na umidade",coluna_umidade_cNAs.isna().sum())
@@ -30,13 +33,22 @@ print("Numero de NAs na umidade",coluna_umidade_cNAs.isna().sum())
 coluna_umidade = coluna_umidade_cNAs.interpolate(method="linear")
 #Numero de NAs final 
 print("Numero de NAs na umidade",coluna_umidade.isna().sum())
+
 #Gráficos de NAS
 #coluna_umidade_cNAs.plot(figsize=(22,4), label="original")
 #coluna_umidade.plot(figsize=(22,4),style=["--"],label="Com correção linear")
 #plt.legend()
 #print(coluna_umidade)
 
-##Coluna temperatura com NAs
+#Atribuição final
+umidade = dados_filtrados[["DT_MEDICAO","HR_MEDICAO","UMD_INS"]]
+umidade["UMD_INS"] = coluna_umidade[["UMD_INS"]] 
+#print(umidade)
+
+
+
+#### Temperatura
+#Coluna temperatura com NAs
 coluna_temperatura_cNAs = dados_filtrados[["TEM_INS"]]
 #Numero de NAs
 print("Numero de NAs na temperatura",coluna_temperatura_cNAs.isna().sum())
@@ -50,30 +62,55 @@ print("Numero de NAs na temperatura",coluna_temperatura.isna().sum())
 #plt.legend()
 #print(coluna_temperatura)
 
-##Coluna radiação com NAs
+temperatura = dados_filtrados[["DT_MEDICAO","HR_MEDICAO","TEM_INS"]]
+temperatura["TEM_INS"] = coluna_temperatura[["TEM_INS"]]
+#print(temperatura)
+
+
+
+#### Radiação
+def correct_neg(x):
+  if (type(x)==str):
+    return x
+  else:
+    if (x<0):
+      return 0
+    else:
+      return x
+
+#Coluna radiação com NAs
 coluna_radiacao_cNAs_0 = dados_filtrados[["RAD_GLO"]]
 #Correção de números negativos
 #fazer coluna_radiacao_cNAs = x for x em coluna_radiacao_0 se um dos elementos de coluna for maior que 0, se não igualar a zero
+coluna_radiacao_cNAs_0["RAD_GLO"] = [correct_neg(x) for x in coluna_radiacao_cNAs_0["RAD_GLO"]]
+#print(coluna_radiacao_cNAs_0)
+coluna_radiacao_cNAs = coluna_radiacao_cNAs_0
+
 #Numero de NAs
 print("Numero de NAs na radiação",coluna_radiacao_cNAs.isna().sum())
 #Correção linear de NAs
 coluna_radiacao = coluna_radiacao_cNAs.interpolate(method="linear")
 #Numero de NAs final 
 print("Numero de NAs na radiação",coluna_radiacao.isna().sum())
+
 #Gráficos de NAS
 #coluna_radiacao_cNAs.plot(figsize=(22,4), label="original")
 #coluna_radiacao.plot(figsize=(22,4),style=["--"],label="Com correção linear")
 #plt.legend()
 #print(coluna_radiacao)
 
+radiacao = dados_filtrados[["DT_MEDICAO","HR_MEDICAO","RAD_GLO"]]
+radiacao["RAD_GLO"] = coluna_radiacao[["RAD_GLO"]]
+#print(radiacao)
 
-### Umidade (falta alterar)(ajustar os dados e fazer a análise gráfica e testes com arima)
-umidade = dados_filtrados[["DT_MEDICAO","HR_MEDICAO","UMD_INS"]]
+
+
+## Análise dos dados
+### Umidade 
 print(umidade)
 
 
-### Temperatura (falta alterar)(ajustar os dados e fazer a análise gráfica e testes com arima)
-temperatura = dados_filtrados[["DT_MEDICAO","HR_MEDICAO","TEM_INS"]]
+### Temperatura
 print(temperatura)
 
 
